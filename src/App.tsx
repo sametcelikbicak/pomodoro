@@ -1,5 +1,10 @@
+import { Button } from "./components/ui/button";
+
 function App() {
-  return <div className="text-2xl text-center">Pomodoro App</div>;
+  return <>
+    <div>Pomodoro App</div>
+    <Button>Let's start</Button>
+  </>
 }
 
 export default App;
