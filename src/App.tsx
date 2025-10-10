@@ -86,32 +86,41 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <Card className="w-[420px]">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 bg-gradient-to-b from-[color:var(--background)] via-[color:var(--muted)]/30 to-[color:var(--background)]">
+      <Card className="w-full max-w-md sm:max-w-lg transition-shadow shadow-lg">
         <CardHeader>
-          <div>
-            <CardTitle>Pomodoro</CardTitle>
-            <CardDescription>{isWork ? "Focus time" : "Break time"}</CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="text-sm text-muted-foreground">Auto-break</div>
-            <Switch
-              checked={autoStartBreak}
-              onCheckedChange={(v) => setAutoStartBreak(Boolean(v))}
-            />
+          <div className="flex w-full items-center justify-between gap-4 flex-col sm:flex-row">
+            <div>
+              <CardTitle>Pomodoro</CardTitle>
+              <CardDescription className="capitalize">{isWork ? "Focus time" : "Break time"}</CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-muted-foreground">Auto-break</div>
+              <Switch
+                checked={autoStartBreak}
+                onCheckedChange={(v) => setAutoStartBreak(Boolean(v))}
+              />
+            </div>
           </div>
         </CardHeader>
 
         <CardContent>
           <div className="flex flex-col items-center gap-4">
-            <div className="text-6xl font-mono">{formatTime(Math.max(0, secondsLeft))}</div>
+            <div
+              aria-live="polite"
+              className="text-5xl sm:text-6xl md:text-7xl font-mono font-semibold"
+              style={{ color: isWork ? 'var(--primary)' : 'var(--secondary)' }}
+            >
+              {formatTime(Math.max(0, secondsLeft))}
+            </div>
             <div className="w-full">
               <Progress value={progress} />
             </div>
-            <div className="grid grid-cols-3 gap-2 w-full">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full">
               <div className="col-span-1">
-                <label className="text-xs text-muted-foreground">Work (min)</label>
+                <label htmlFor="work-minutes" className="text-xs text-muted-foreground">Work (min)</label>
                 <Input
+                  id="work-minutes"
                   type="number"
                   value={workMinutes}
                   onChange={(e) => setWorkMinutes(Math.max(1, Number(e.target.value) || 1))}
@@ -119,8 +128,9 @@ function App() {
                 />
               </div>
               <div className="col-span-1">
-                <label className="text-xs text-muted-foreground">Short break (min)</label>
+                <label htmlFor="short-break" className="text-xs text-muted-foreground">Short break (min)</label>
                 <Input
+                  id="short-break"
                   type="number"
                   value={shortBreakMinutes}
                   onChange={(e) => setShortBreakMinutes(Math.max(1, Number(e.target.value) || 1))}
@@ -128,8 +138,9 @@ function App() {
                 />
               </div>
               <div className="col-span-1">
-                <label className="text-xs text-muted-foreground">Long break (min)</label>
+                <label htmlFor="long-break" className="text-xs text-muted-foreground">Long break (min)</label>
                 <Input
+                  id="long-break"
                   type="number"
                   value={longBreakMinutes}
                   onChange={(e) => setLongBreakMinutes(Math.max(1, Number(e.target.value) || 1))}
@@ -138,8 +149,9 @@ function App() {
               </div>
             </div>
             <div className="w-full mt-2">
-              <label className="text-xs text-muted-foreground">Cycles before long break</label>
+              <label htmlFor="cycles" className="text-xs text-muted-foreground">Cycles before long break</label>
               <Input
+                id="cycles"
                 type="number"
                 value={cyclesBeforeLongBreak}
                 onChange={(e) => setCyclesBeforeLongBreak(Math.max(1, Number(e.target.value) || 1))}
@@ -150,19 +162,11 @@ function App() {
         </CardContent>
 
         <CardFooter>
-          <div className="flex items-center gap-2 w-full">
-            <Button onClick={startPause} className="flex-1">
-              {isRunning ? (
-                <>
-                  Pause
-                </>
-              ) : (
-                <>
-                  Start
-                </>
-              )}
+          <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+            <Button onClick={startPause} className="w-full sm:flex-1">
+              {isRunning ? 'Pause' : 'Start'}
             </Button>
-            <Button variant="outline" onClick={reset}>
+            <Button variant="outline" onClick={reset} className="w-full sm:w-auto">
               Reset
             </Button>
           </div>
