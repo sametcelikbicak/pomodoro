@@ -1,10 +1,18 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type FC,
+  type ReactNode,
+} from 'react';
 
 type Stats = {
   workSessions: number;
   totalFocusSeconds: number;
   totalBreakSeconds: number;
   roundsCompleted: number;
+  shortBreaksTaken: number;
   longBreaksTaken: number;
 };
 
@@ -21,6 +29,7 @@ const defaultStats: Stats = {
   totalFocusSeconds: 0,
   totalBreakSeconds: 0,
   roundsCompleted: 0,
+  shortBreaksTaken: 0,
   longBreaksTaken: 0,
 };
 
@@ -34,9 +43,7 @@ const StatsContext = createContext<StatsContextType>({
 
 export const useStats = () => useContext(StatsContext);
 
-export const StatsProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const StatsProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [stats, setStats] = useState<Stats>(() => {
     try {
       const raw =
@@ -69,6 +76,7 @@ export const StatsProvider: React.FC<{ children: React.ReactNode }> = ({
     setStats((s) => ({
       ...s,
       totalBreakSeconds: s.totalBreakSeconds + seconds,
+      shortBreaksTaken: s.shortBreaksTaken + (isLong ? 0 : 1),
       longBreaksTaken: s.longBreaksTaken + (isLong ? 1 : 0),
     }));
   };

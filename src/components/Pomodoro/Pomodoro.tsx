@@ -38,6 +38,71 @@ function Pomodoro() {
 
   const { recordWorkSession, recordBreak, incrementRounds } = useStats();
 
+  // small Web Audio-based player so we can play distinct sounds per session type
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  function ensureAudioContext() {
+    if (!audioCtxRef.current) {
+      const Ctor =
+        (window as any).AudioContext || (window as any).webkitAudioContext;
+      if (Ctor) audioCtxRef.current = new Ctor();
+    }
+    return audioCtxRef.current;
+  }
+
+  function playTone(freq: number, duration = 0.15, when = 0) {
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    const t = ctx.currentTime + when;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(0.3, t + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + duration + 0.02);
+  }
+
+  function playSequence(
+    sequence: Array<{ freq: number; dur?: number; gap?: number }>
+  ) {
+    const ctx = ensureAudioContext();
+    if (!ctx) return;
+    let offset = 0;
+    for (const item of sequence) {
+      playTone(item.freq, item.dur ?? 0.15, offset);
+      offset += (item.dur ?? 0.15) + (item.gap ?? 0.08);
+    }
+  }
+
+  function playSoundForFinishedSession(type: 'work' | 'short' | 'long') {
+    // try to resume context (user gesture may be required on some browsers)
+    const ctx = ensureAudioContext();
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+
+    if (type === 'work') {
+      // single higher beep
+      playSequence([{ freq: 880, dur: 2 }]);
+    } else if (type === 'short') {
+      // two medium beeps
+      playSequence([
+        { freq: 770, dur: 0.5 },
+        { freq: 660, dur: 0.5, gap: 0.12 },
+      ]);
+    } else {
+      // long break: three lower beeps
+      playSequence([
+        { freq: 550, dur: 0.5 },
+        { freq: 440, dur: 0.5, gap: 0.08 },
+        { freq: 330, dur: 0.5, gap: 0.08 },
+      ]);
+    }
+  }
+
   // remember original document title so we can restore it on unmount
   const originalTitleRef = useRef<string>(
     typeof document !== 'undefined' ? document.title : ''
@@ -86,6 +151,13 @@ function Pomodoro() {
     if (secondsLeft > 0) return;
     // finished session
     setIsRunning(false);
+    // play a sound for the finished session
+    try {
+      if (isWork) playSoundForFinishedSession('work');
+      else playSoundForFinishedSession(isLongBreak ? 'long' : 'short');
+    } catch (e) {
+      // ignore audio errors
+    }
     // compute elapsed seconds from configured durations and remaining seconds
     const originalTotal = isWork
       ? workMinutes * 60
@@ -147,6 +219,11 @@ function Pomodoro() {
 
   function startPause() {
     setIsRunning((r) => !r);
+    // resume audio context on first user interaction so browsers allow sound later
+    const ctx = ensureAudioContext();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
   }
 
   function reset() {
@@ -194,6 +271,7 @@ function Pomodoro() {
           <div className="flex items-center gap-2">
             <div className="text-sm text-muted-foreground">Auto-break</div>
             <Switch
+              className="cursor-pointer"
               checked={autoStartBreak}
               onCheckedChange={(v) => setAutoStartBreak(Boolean(v))}
             />
@@ -287,22 +365,21 @@ function Pomodoro() {
 
       <CardFooter>
         <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
-          <Button onClick={startPause} className="w-full sm:flex-1">
+          <Button
+            onClick={startPause}
+            className="w-full sm:flex-1 cursor-pointer"
+          >
             <TimerIcon /> {isRunning ? 'Pause' : 'Start'}
           </Button>
           <Button
             variant="outline"
             onClick={reset}
-            className="w-full sm:w-auto"
+            className="w-full sm:w-auto cursor-pointer"
           >
             Reset
           </Button>
         </div>
       </CardFooter>
-
-      <div className="px-6 mt-2 text-sm text-muted-foreground">
-        Rounds completed: {rounds}
-      </div>
     </Card>
   );
 }
