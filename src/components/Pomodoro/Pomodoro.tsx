@@ -170,11 +170,20 @@ function Pomodoro() {
     <Card className="w-full max-w-md sm:max-w-lg transition-shadow shadow-lg">
       <CardHeader>
         <div className="flex w-full items-center justify-between gap-4 flex-col sm:flex-row">
-          <div>
-            <CardTitle>Pomodoro</CardTitle>
-            <CardDescription className="capitalize">
-              {isWork ? "Focus time" : "Break time"}
-            </CardDescription>
+          <div className="flex items-center gap-3">
+            <img
+              src="./pomodoro.svg"
+              alt="Pomodoro"
+              width={40}
+              height={40}
+              className="rounded-full shadow-sm"
+            />
+            <div>
+              <CardTitle>Pomodoro</CardTitle>
+              <CardDescription className="capitalize">
+                {isWork ? "Focus time" : "Break time"}
+              </CardDescription>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-sm text-muted-foreground">Auto-break</div>
