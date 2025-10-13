@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { useStats } from "@/context/StatsContext";
-import { Button } from "@/components/ui/button";
+import { useEffect, useRef, useState } from 'react';
+import { useStats } from '@/context/StatsContext';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardHeader,
@@ -8,19 +8,19 @@ import {
   CardContent,
   CardFooter,
   CardDescription,
-} from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import { TimerIcon } from "lucide-react";
+} from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { TimerIcon } from 'lucide-react';
 
 function formatTime(sec: number) {
   const m = Math.floor(sec / 60)
     .toString()
-    .padStart(2, "0");
+    .padStart(2, '0');
   const s = Math.floor(sec % 60)
     .toString()
-    .padStart(2, "0");
+    .padStart(2, '0');
   return `${m}:${s}`;
 }
 
@@ -40,13 +40,13 @@ function Pomodoro() {
 
   // remember original document title so we can restore it on unmount
   const originalTitleRef = useRef<string>(
-    typeof document !== "undefined" ? document.title : "",
+    typeof document !== 'undefined' ? document.title : ''
   );
 
   // update document.title to show remaining time, current mode and paused state
   useEffect(() => {
-    const mode = isWork ? "Focus" : isLongBreak ? "Long Break" : "Short Break";
-    const paused = isRunning ? "" : " (Paused)";
+    const mode = isWork ? 'Focus' : isLongBreak ? 'Long Break' : 'Short Break';
+    const paused = isRunning ? '' : ' (Paused)';
     // format time and set title
     document.title = `${formatTime(Math.max(0, secondsLeft))} — ${mode}${paused}`;
   }, [secondsLeft, isWork, isLongBreak, isRunning]);
@@ -67,7 +67,7 @@ function Pomodoro() {
           ? workMinutes * 60
           : isLongBreak
             ? longBreakMinutes * 60
-            : shortBreakMinutes * 60,
+            : shortBreakMinutes * 60
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -96,27 +96,32 @@ function Pomodoro() {
 
     if (isWork) {
       // just finished a work session
-      setRounds((r) => {
-        const newRounds = r + 1;
-        const useLong =
-          cyclesBeforeLongBreak > 0 && newRounds % cyclesBeforeLongBreak === 0;
-        setIsWork(false);
-        setIsLongBreak(useLong);
-        setSecondsLeft((useLong ? longBreakMinutes : shortBreakMinutes) * 60);
-        if (autoStartBreak) setIsRunning(true);
-        // record stats: actual elapsed computed from timer
-        try {
+      const newRounds = rounds + 1;
+      const useLong =
+        cyclesBeforeLongBreak > 0 && newRounds % cyclesBeforeLongBreak === 0;
+      // update local state
+      setRounds(newRounds);
+      setIsWork(false);
+      setIsLongBreak(useLong);
+      setSecondsLeft((useLong ? longBreakMinutes : shortBreakMinutes) * 60);
+      if (autoStartBreak) setIsRunning(true);
+      // record stats after state updates to avoid cross-component setState during render
+      try {
+        // schedule on next tick to be safe
+        Promise.resolve().then(() => {
           recordWorkSession(elapsedSec);
           incrementRounds(1);
-        } catch (e) {
-          // ignore
-        }
-        return newRounds;
-      });
+        });
+      } catch (e) {
+        // ignore
+      }
     } else {
       // finished a break
       try {
-        recordBreak(elapsedSec, Boolean(isLongBreak));
+        // schedule recording to avoid cross-component setState during render
+        Promise.resolve().then(() => {
+          recordBreak(elapsedSec, Boolean(isLongBreak));
+        });
       } catch (e) {
         // ignore
       }
@@ -137,7 +142,7 @@ function Pomodoro() {
         : shortBreakMinutes * 60) || 1;
   const progress = Math.max(
     0,
-    Math.min(100, Math.round((1 - secondsLeft / total) * 100)),
+    Math.min(100, Math.round((1 - secondsLeft / total) * 100))
   );
 
   function startPause() {
@@ -182,7 +187,7 @@ function Pomodoro() {
             <div>
               <CardTitle>Pomodoro</CardTitle>
               <CardDescription className="capitalize">
-                {isWork ? "Focus time" : "Break time"}
+                {isWork ? 'Focus time' : 'Break time'}
               </CardDescription>
             </div>
           </div>
@@ -201,7 +206,7 @@ function Pomodoro() {
           <div
             aria-live="polite"
             className="text-5xl sm:text-6xl md:text-7xl font-mono font-semibold"
-            style={{ color: isWork ? "var(--primary)" : "var(--secondary)" }}
+            style={{ color: isWork ? 'var(--primary)' : 'var(--secondary)' }}
           >
             {formatTime(Math.max(0, secondsLeft))}
           </div>
@@ -271,7 +276,7 @@ function Pomodoro() {
               value={cyclesBeforeLongBreak}
               onChange={(e) =>
                 setCyclesBeforeLongBreak(
-                  Math.max(1, Number(e.target.value) || 1),
+                  Math.max(1, Number(e.target.value) || 1)
                 )
               }
               className="mt-1"
@@ -283,7 +288,7 @@ function Pomodoro() {
       <CardFooter>
         <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
           <Button onClick={startPause} className="w-full sm:flex-1">
-            <TimerIcon /> {isRunning ? "Pause" : "Start"}
+            <TimerIcon /> {isRunning ? 'Pause' : 'Start'}
           </Button>
           <Button
             variant="outline"

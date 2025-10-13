@@ -1,12 +1,12 @@
 // React import not required in newer JSX runtimes
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { useStats } from "@/context/StatsContext";
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { useStats } from '@/context/StatsContext';
 
 function secondsToHMS(sec: number) {
   const h = Math.floor(sec / 3600);
   const m = Math.floor((sec % 3600) / 60);
   const s = Math.floor(sec % 60);
-  return [h, m, s].map((n) => n.toString().padStart(2, "0")).join(":");
+  return [h, m, s].map((n) => n.toString().padStart(2, '0')).join(':');
 }
 
 export default function Statistics() {
