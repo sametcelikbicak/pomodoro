@@ -1,6 +1,6 @@
-// React import not required in newer JSX runtimes
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useStats } from '@/context/StatsContext';
+import { Button } from '@/components/ui/button';
 
 function secondsToHMS(sec: number) {
   const h = Math.floor(sec / 3600);
@@ -25,6 +25,9 @@ export default function Statistics() {
           <div className="text-muted-foreground">Rounds completed</div>
           <div className="text-right">{stats.roundsCompleted}</div>
 
+          <div className="text-muted-foreground">Short breaks</div>
+          <div className="text-right">{stats.shortBreaksTaken}</div>
+
           <div className="text-muted-foreground">Long breaks</div>
           <div className="text-right">{stats.longBreaksTaken}</div>
 
@@ -40,12 +43,13 @@ export default function Statistics() {
         </div>
 
         <div className="mt-4 text-right">
-          <button
-            className="text-xs text-destructive underline cursor-pointer"
+          <Button
+            variant="secondary"
+            className="text-xs cursor-pointer"
             onClick={resetStats}
           >
             Reset stats
-          </button>
+          </Button>
         </div>
       </CardContent>
     </Card>

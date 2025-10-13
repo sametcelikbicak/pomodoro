@@ -26,11 +26,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src"]
-  ,
-  "exclude": [
-    "src/**/*.test.*",
-    "src/**/*.spec.*",
-    "jest.setup.ts"
-  ]
+  "include": ["src"],
+  "exclude": ["src/**/*.test.*", "src/**/*.spec.*", "jest.setup.ts"]
 }
