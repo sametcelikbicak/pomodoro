@@ -12,6 +12,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { TimerIcon } from "lucide-react";
 
 function formatTime(sec: number) {
   const m = Math.floor(sec / 60)
@@ -282,7 +283,7 @@ function Pomodoro() {
       <CardFooter>
         <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
           <Button onClick={startPause} className="w-full sm:flex-1">
-            {isRunning ? "Pause" : "Start"}
+            <TimerIcon /> {isRunning ? "Pause" : "Start"}
           </Button>
           <Button
             variant="outline"
