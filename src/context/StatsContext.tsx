@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type Stats = {
   workSessions: number;
@@ -40,8 +40,8 @@ export const StatsProvider: React.FC<{ children: React.ReactNode }> = ({
   const [stats, setStats] = useState<Stats>(() => {
     try {
       const raw =
-        typeof window !== "undefined"
-          ? window.localStorage.getItem("pomodoro_stats")
+        typeof window !== 'undefined'
+          ? window.localStorage.getItem('pomodoro_stats')
           : null;
       return raw ? JSON.parse(raw) : defaultStats;
     } catch (e) {
@@ -51,7 +51,7 @@ export const StatsProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     try {
-      window.localStorage.setItem("pomodoro_stats", JSON.stringify(stats));
+      window.localStorage.setItem('pomodoro_stats', JSON.stringify(stats));
     } catch (e) {
       // ignore
     }
@@ -79,7 +79,7 @@ export const StatsProvider: React.FC<{ children: React.ReactNode }> = ({
   const resetStats = () => {
     setStats(defaultStats);
     try {
-      window.localStorage.removeItem("pomodoro_stats");
+      window.localStorage.removeItem('pomodoro_stats');
     } catch (e) {
       // ignore
     }

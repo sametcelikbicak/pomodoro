@@ -117,18 +117,4 @@ Suggested workflow:
 
 ## License
 
-This project does not include a license file. Add one to make your intended reuse policy explicit (e.g. MIT).
-
-## Contact
-
-If you have questions or want help extending the project, open an issue or get in touch via the GitHub repository.
-
----
-
-If you'd like, I can also:
-
-- Add a usage screenshot to `public/` and reference it from the README
-- Add a contributor guide or a short CHANGELOG template
-- Add a simple test for the `formatTime` helper from `src/components/Pomodoro/Pomodoro.tsx`
-
-Let me know which (if any) you'd like and I'll add them.
+MIT

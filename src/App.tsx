@@ -1,6 +1,6 @@
-import Pomodoro from "@/components/Pomodoro/Pomodoro";
-import Statistics from "@/components/Statistics/Statistics";
-import { StatsProvider } from "@/context/StatsContext";
+import Pomodoro from '@/components/Pomodoro/Pomodoro';
+import Statistics from '@/components/Statistics/Statistics';
+import { StatsProvider } from '@/context/StatsContext';
 
 function App() {
   return (
