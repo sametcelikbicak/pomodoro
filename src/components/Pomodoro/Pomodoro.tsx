@@ -249,6 +249,55 @@ function Pomodoro() {
     setRounds(0);
   }
 
+  // listen to global commands (from command palette)
+  useEffect(() => {
+    function onCmd(ev: Event) {
+      const e = ev as CustomEvent<{ id: string }>;
+      const id = e?.detail?.id;
+      if (!id) return;
+      switch (id) {
+        case 'start-pause':
+          startPause();
+          break;
+        case 'reset':
+          reset();
+          break;
+        case 'work':
+          setIsWork(true);
+          setIsLongBreak(false);
+          setSecondsLeft(workMinutes * 60);
+          setIsRunning(false);
+          break;
+        case 'short':
+          setIsWork(false);
+          setIsLongBreak(false);
+          setSecondsLeft(shortBreakMinutes * 60);
+          setIsRunning(true);
+          break;
+        case 'long':
+          setIsWork(false);
+          setIsLongBreak(true);
+          setSecondsLeft(longBreakMinutes * 60);
+          setIsRunning(true);
+          break;
+        case 'toggle-auto':
+          setAutoStartBreak((v) => !v);
+          break;
+        case 'open-stats':
+          // scroll statistics into view
+          const stats = document.querySelector('[data-slot=statistics]');
+          if (stats)
+            stats.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          break;
+      }
+    }
+    window.addEventListener('pomodoro:command', onCmd as EventListener);
+    return () =>
+      window.removeEventListener('pomodoro:command', onCmd as EventListener);
+    // include dependencies that represent the durations so commands set correct seconds
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workMinutes, shortBreakMinutes, longBreakMinutes]);
+
   return (
     <Card className="w-full max-w-md sm:max-w-lg transition-shadow shadow-lg">
       <CardHeader>
