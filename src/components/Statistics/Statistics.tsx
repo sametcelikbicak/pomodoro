@@ -13,7 +13,7 @@ export default function Statistics() {
   const { stats, resetStats } = useStats();
 
   return (
-    <Card className="w-full max-w-md shadow">
+    <Card data-slot="statistics" className="w-full max-w-md shadow">
       <CardHeader>
         <CardTitle>Statistics</CardTitle>
       </CardHeader>
