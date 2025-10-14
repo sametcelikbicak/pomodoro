@@ -25,7 +25,7 @@ function App() {
     <StatsProvider>
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-[color:var(--background)] via-[color:var(--muted)]/50 to-[color:var(--primary)] dark">
         <Header onOpenPalette={() => setCommandOpen(true)} />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start mx-auto">
+        <div className="my-auto grid grid-cols-1 lg:grid-cols-2 gap-6 items-start mx-auto">
           <Pomodoro />
           <Statistics />
         </div>

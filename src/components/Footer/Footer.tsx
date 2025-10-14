@@ -36,7 +36,7 @@ const socialLinks = [
 
 function Footer() {
   return (
-    <footer className="text-center text-text-secondary text-xs border-t border-gray-200 mt-2">
+    <footer className="text-center text-text-secondary text-xs border-t border-gray-200 my-2">
       <div className="flex gap-4 justify-center my-3">
         {socialLinks.map((link) => {
           const Icon = link.icon;
