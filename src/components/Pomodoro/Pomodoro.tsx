@@ -13,6 +13,10 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { TimerIcon } from 'lucide-react';
+import {
+  showWorkCompleteNotification,
+  showBreakCompleteNotification,
+} from '@/utils/notifications';
 
 function formatTime(sec: number) {
   const m = Math.floor(sec / 60)
@@ -155,7 +159,7 @@ function Pomodoro() {
     try {
       if (isWork) playSoundForFinishedSession('work');
       else playSoundForFinishedSession(isLongBreak ? 'long' : 'short');
-    } catch (e) {
+    } catch {
       // ignore audio errors
     }
     // compute elapsed seconds from configured durations and remaining seconds
@@ -177,6 +181,11 @@ function Pomodoro() {
       setIsLongBreak(useLong);
       setSecondsLeft((useLong ? longBreakMinutes : shortBreakMinutes) * 60);
       if (autoStartBreak) setIsRunning(true);
+      try {
+        showWorkCompleteNotification(newRounds);
+      } catch (e) {
+        console.error('Error showing work notification:', e);
+      }
       // record stats after state updates to avoid cross-component setState during render
       try {
         // schedule on next tick to be safe
@@ -184,17 +193,23 @@ function Pomodoro() {
           recordWorkSession(elapsedSec);
           incrementRounds(1);
         });
-      } catch (e) {
+      } catch {
         // ignore
       }
     } else {
       // finished a break
+
+      try {
+        showBreakCompleteNotification(isLongBreak);
+      } catch (e) {
+        console.error('Error showing break notification:', e);
+      }
       try {
         // schedule recording to avoid cross-component setState during render
         Promise.resolve().then(() => {
           recordBreak(elapsedSec, Boolean(isLongBreak));
         });
-      } catch (e) {
+      } catch {
         // ignore
       }
 
@@ -239,7 +254,7 @@ function Pomodoro() {
         if (isWork) recordWorkSession(elapsed);
         else recordBreak(elapsed, Boolean(isLongBreak));
       }
-    } catch (e) {
+    } catch {
       // ignore
     }
 

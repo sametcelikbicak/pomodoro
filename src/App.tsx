@@ -5,6 +5,7 @@ import CommandPalette from '@/components/CommandPalette/CommandPalette';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';
 import { useEffect, useState } from 'react';
+import { requestNotificationPermission } from '@/utils/notifications';
 
 function App() {
   const [commandOpen, setCommandOpen] = useState(false);
@@ -21,6 +22,12 @@ function App() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  // Request notification permission on app load
+  useEffect(() => {
+    requestNotificationPermission().catch(console.error);
+  }, []);
+
   return (
     <StatsProvider>
       <div className="min-h-screen flex flex-col bg-gradient-to-b from-[color:var(--background)] via-[color:var(--muted)]/50 to-[color:var(--primary)] dark">
