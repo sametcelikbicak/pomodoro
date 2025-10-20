@@ -1,6 +1,6 @@
 import Pomodoro from '@/components/Pomodoro/Pomodoro';
 import Statistics from '@/components/Statistics/Statistics';
-import { StatsProvider } from '@/context/StatsContext';
+import { StatsProvider } from '@/context/StatsProvider';
 import CommandPalette from '@/components/CommandPalette/CommandPalette';
 import Header from '@/components/Header/Header';
 import Footer from '@/components/Footer/Footer';

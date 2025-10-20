@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import Statistics from './Statistics';
-import { StatsProvider } from '../../context/StatsContext';
+import { StatsProvider } from '../../context/StatsProvider';
 
 describe('Statistics component', () => {
   beforeEach(() => {

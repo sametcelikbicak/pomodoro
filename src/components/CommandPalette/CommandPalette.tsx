@@ -16,19 +16,31 @@ import {
   Repeat,
   BarChart2,
 } from 'lucide-react';
-import { useEffect, useMemo, useState, type ComponentType } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentType,
+} from 'react';
 
 type CommandPaletteProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
+type IconProps = {
+  size?: number | string;
+  strokeWidth?: number;
+  className?: string;
+};
+
 const commands: Array<{
   id: string;
   title: string;
   shortcut?: string;
-  Icon?: ComponentType<any>;
-  detail?: any;
+  Icon?: ComponentType<IconProps>;
+  detail?: unknown;
 }> = [
   {
     id: 'start-pause',
@@ -68,13 +80,16 @@ export default function CommandPalette({
 
   const [query, setQuery] = useState('');
 
-  function runCommand(id: string) {
-    // close palette first
-    onOpenChange(false);
-    // dispatch a global event so components can react
-    const ev = new CustomEvent('pomodoro:command', { detail: { id } });
-    window.dispatchEvent(ev);
-  }
+  const runCommand = useCallback(
+    (id: string) => {
+      // close palette first
+      onOpenChange(false);
+      // dispatch a global event so components can react
+      const ev = new CustomEvent('pomodoro:command', { detail: { id } });
+      window.dispatchEvent(ev);
+    },
+    [onOpenChange]
+  );
 
   // enable single-key shortcuts while palette is open WHEN the query is empty
   useEffect(() => {
@@ -84,7 +99,12 @@ export default function CommandPalette({
       try {
         if (e.defaultPrevented) return;
         // ignore modifier combos and composition
-        if (e.metaKey || e.ctrlKey || e.altKey || (e as any).isComposing)
+        if (
+          e.metaKey ||
+          e.ctrlKey ||
+          e.altKey ||
+          (e as KeyboardEvent & { isComposing?: boolean }).isComposing
+        )
           return;
         const k = e.key;
         if (!k || k.length !== 1) return;
@@ -98,14 +118,14 @@ export default function CommandPalette({
           e.preventDefault();
           runCommand(match.id);
         }
-      } catch (err) {
+      } catch {
         // ignore
       }
     }
 
     window.addEventListener('keydown', onKey, true);
     return () => window.removeEventListener('keydown', onKey, true);
-  }, [open, query]);
+  }, [open, query, runCommand]);
 
   // small fuzzy scoring: higher is better. 0 means no match.
   function fuzzyScore(q: string, text: string) {

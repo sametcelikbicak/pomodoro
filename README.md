@@ -20,6 +20,7 @@ This app provides a focused-timer experience with configurable work/short-break/
 - Visual progress bar and remaining time in the document title
 - Rounds counter and simple statistics (work sessions, focus time, breaks, rounds, long breaks)
 - Statistics persisted in `localStorage` so they remain between sessions
+- Desktop notifications
 
 ## How it works (user-facing)
 
@@ -46,11 +47,16 @@ The tracked metrics include:
 
 ## Tech stack
 
-- React 19 + TypeScript
+- React + TypeScript
 - Vite (dev server + build)
 - Tailwind CSS + utility components
-- Radix UI components and small UI primitives in `src/components/ui`
+- Radix UI components (Dialog, Label, Progress, Switch) and small UI primitives in `src/components/ui`
+- Class Variance Authority for component variants
+- React Hook Form with resolvers for form handling
+- Command palette (cmdk) for keyboard shortcuts
+- Date-fns for date manipulation
 - `lucide-react` for icons
+- Jest for testing
 
 ## Getting started (development)
 
@@ -94,6 +100,25 @@ To deploy:
 
 ```bash
 npm run deploy
+```
+
+## Project Structure
+
+```
+src/
+├── components/         # React components
+│   ├── CommandPalette/  # Command palette component for keyboard shortcuts
+│   ├── Footer/          # Footer component
+│   ├── Header/          # Header component
+│   ├── Pomodoro/        # Main Pomodoro timer component
+│   ├── Statistics/      # Statistics display component
+│   └── ui/              # Reusable UI components (buttons, cards, inputs, etc.)
+├── context/           # React context for state management
+│   └── stats-context  # Statistics context and provider
+├── hooks/            # Custom React hooks
+│   └── use-stats     # Hook for accessing statistics
+├── lib/              # Utility functions and helpers
+└── utils/            # Additional utilities (notifications, etc.)
 ```
 
 ## Developer notes
