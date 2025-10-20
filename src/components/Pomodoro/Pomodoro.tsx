@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useStats } from '@/context/StatsContext';
+import { useStats } from '@/hooks/use-stats';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -48,7 +48,18 @@ function Pomodoro() {
   function ensureAudioContext() {
     if (!audioCtxRef.current) {
       const Ctor =
-        (window as any).AudioContext || (window as any).webkitAudioContext;
+        (
+          window as {
+            AudioContext?: typeof AudioContext;
+            webkitAudioContext?: typeof AudioContext;
+          }
+        ).AudioContext ||
+        (
+          window as {
+            AudioContext?: typeof AudioContext;
+            webkitAudioContext?: typeof AudioContext;
+          }
+        ).webkitAudioContext;
       if (Ctor) audioCtxRef.current = new Ctor();
     }
     return audioCtxRef.current;
@@ -122,8 +133,9 @@ function Pomodoro() {
 
   // restore original title when component unmounts
   useEffect(() => {
+    const titleToRestore = originalTitleRef.current;
     return () => {
-      document.title = originalTitleRef.current;
+      document.title = titleToRestore;
     };
   }, []);
 
@@ -298,12 +310,13 @@ function Pomodoro() {
         case 'toggle-auto':
           setAutoStartBreak((v) => !v);
           break;
-        case 'open-stats':
+        case 'open-stats': {
           // scroll statistics into view
           const stats = document.querySelector('[data-slot=statistics]');
           if (stats)
             stats.scrollIntoView({ behavior: 'smooth', block: 'center' });
           break;
+        }
       }
     }
     window.addEventListener('pomodoro:command', onCmd as EventListener);

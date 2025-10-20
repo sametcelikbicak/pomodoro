@@ -1,6 +1,6 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import Pomodoro from './Pomodoro';
-import { StatsProvider } from '../../context/StatsContext';
+import { StatsProvider } from '../../context/StatsProvider';
 
 describe('Pomodoro component', () => {
   beforeEach(() => {

@@ -1,5 +1,5 @@
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { useStats } from '@/context/StatsContext';
+import { useStats } from '@/hooks/use-stats';
 import { Button } from '@/components/ui/button';
 
 function secondsToHMS(sec: number) {

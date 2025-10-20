@@ -9,12 +9,18 @@ const timerFns = [
   'advanceTimersToNextTimer',
 ];
 
+type JestWithTimers = {
+  [key: string]: unknown;
+  advanceTimersByTime?: (ms: number) => void;
+  runAllTimers?: () => void;
+  runOnlyPendingTimers?: () => void;
+  advanceTimersToNextTimer?: () => void;
+};
+
 timerFns.forEach((fnName) => {
-  // @ts-ignore - jest types may not include our runtime augmentation
-  const original = (jest as any)[fnName];
+  const original = (jest as JestWithTimers)[fnName];
   if (typeof original === 'function') {
-    // @ts-ignore
-    (jest as any)[fnName] = (...args: any[]) =>
+    (jest as JestWithTimers)[fnName] = (...args: unknown[]) =>
       act(() => original.apply(jest, args));
   }
 });
@@ -25,5 +31,8 @@ import '@testing-library/jest-dom';
 // Let React know we're in a test environment that uses act(). This
 // suppresses warnings about updates not wrapped in act when using
 // fake timers in Jest (React 18+).
-// @ts-ignore
+declare global {
+  var IS_REACT_ACT_ENVIRONMENT: boolean;
+}
+
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
