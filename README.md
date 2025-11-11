@@ -89,8 +89,7 @@ Open http://localhost:5173 (or the address printed by Vite) to view the app.
 - `npm run build` — run TypeScript build and produce a production-ready `dist` via Vite
 - `npm run preview` — preview a production build locally
 - `npm run deploy` — run `predeploy` (build) then publish the `dist` folder to GitHub Pages (uses `gh-pages`)
-- `npm run lint` / `npm run lint-fix` — run ESLint
-- `npm run format` — run Prettier
+- `npm run format` — run Biome lint and prettier rules
 
 ## Deployment
 
@@ -138,7 +137,7 @@ Suggested workflow:
 
 1. Fork the repository and create a feature branch
 2. Run and test locally (`npm install && npm run dev`)
-3. Keep code formatted with `npm run format` and linted with `npm run lint` before submitting a PR
+3. Keep code formatted with `npm run format` before submitting a PR
 
 ## License
 
