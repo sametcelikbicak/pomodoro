@@ -1,4 +1,4 @@
-import { Kbd } from '@/components/ui/kbd';
+import { Kbd } from "@/components/ui/kbd";
 
 export default function Header({
   onOpenPalette,
@@ -6,9 +6,9 @@ export default function Header({
   onOpenPalette?: () => void;
 }) {
   const isMac =
-    typeof navigator !== 'undefined' &&
+    typeof navigator !== "undefined" &&
     /Mac|iPhone|iPad|iPod/.test(
-      navigator.platform || navigator.userAgent || ''
+      navigator.platform || navigator.userAgent || ""
     );
 
   const shortcut = isMac ? (
@@ -43,7 +43,7 @@ export default function Header({
             </div>
 
             <button type="button" onClick={() => onOpenPalette?.()}>
-              <span className="font-medium">{shortcut}</span>
+              <span className="font-medium cursor-pointer">{shortcut}</span>
             </button>
           </div>
         </div>

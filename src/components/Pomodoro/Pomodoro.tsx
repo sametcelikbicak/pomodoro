@@ -1,30 +1,30 @@
-import { useEffect, useRef, useState } from 'react';
-import { useStats } from '@/hooks/use-stats';
-import { Button } from '@/components/ui/button';
+import { TimerIcon } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardContent,
-  CardFooter,
-  CardDescription,
-} from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Input } from '@/components/ui/input';
-import { Switch } from '@/components/ui/switch';
-import { TimerIcon } from 'lucide-react';
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { useStats } from "@/hooks/use-stats";
 import {
-  showWorkCompleteNotification,
   showBreakCompleteNotification,
-} from '@/utils/notifications';
+  showWorkCompleteNotification,
+} from "@/utils/notifications";
 
 function formatTime(sec: number) {
   const m = Math.floor(sec / 60)
     .toString()
-    .padStart(2, '0');
+    .padStart(2, "0");
   const s = Math.floor(sec % 60)
     .toString()
-    .padStart(2, '0');
+    .padStart(2, "0");
   return `${m}:${s}`;
 }
 
@@ -71,7 +71,7 @@ function Pomodoro() {
     const t = ctx.currentTime + when;
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
-    osc.type = 'sine';
+    osc.type = "sine";
     osc.frequency.value = freq;
     gain.gain.setValueAtTime(0.0001, t);
     gain.gain.exponentialRampToValueAtTime(0.3, t + 0.01);
@@ -94,39 +94,43 @@ function Pomodoro() {
     }
   }
 
-  function playSoundForFinishedSession(type: 'work' | 'short' | 'long') {
-    // try to resume context (user gesture may be required on some browsers)
-    const ctx = ensureAudioContext();
-    if (ctx && ctx.state === 'suspended') ctx.resume().catch(() => {});
+  // biome-ignore lint/correctness/useExhaustiveDependencies: helper functions are stable
+  const playSoundForFinishedSession = useCallback(
+    (type: "work" | "short" | "long") => {
+      // try to resume context (user gesture may be required on some browsers)
+      const ctx = ensureAudioContext();
+      if (ctx && ctx.state === "suspended") ctx.resume().catch(() => {});
 
-    if (type === 'work') {
-      // single higher beep
-      playSequence([{ freq: 880, dur: 2 }]);
-    } else if (type === 'short') {
-      // two medium beeps
-      playSequence([
-        { freq: 770, dur: 0.5 },
-        { freq: 660, dur: 0.5, gap: 0.12 },
-      ]);
-    } else {
-      // long break: three lower beeps
-      playSequence([
-        { freq: 550, dur: 0.5 },
-        { freq: 440, dur: 0.5, gap: 0.08 },
-        { freq: 330, dur: 0.5, gap: 0.08 },
-      ]);
-    }
-  }
+      if (type === "work") {
+        // single higher beep
+        playSequence([{ freq: 880, dur: 2 }]);
+      } else if (type === "short") {
+        // two medium beeps
+        playSequence([
+          { freq: 770, dur: 0.5 },
+          { freq: 660, dur: 0.5, gap: 0.12 },
+        ]);
+      } else {
+        // long break: three lower beeps
+        playSequence([
+          { freq: 550, dur: 0.5 },
+          { freq: 440, dur: 0.5, gap: 0.08 },
+          { freq: 330, dur: 0.5, gap: 0.08 },
+        ]);
+      }
+    },
+    []
+  );
 
   // remember original document title so we can restore it on unmount
   const originalTitleRef = useRef<string>(
-    typeof document !== 'undefined' ? document.title : ''
+    typeof document !== "undefined" ? document.title : ""
   );
 
   // update document.title to show remaining time, current mode and paused state
   useEffect(() => {
-    const mode = isWork ? 'Focus' : isLongBreak ? 'Long Break' : 'Short Break';
-    const paused = isRunning ? '' : ' (Paused)';
+    const mode = isWork ? "Focus" : isLongBreak ? "Long Break" : "Short Break";
+    const paused = isRunning ? "" : " (Paused)";
     // format time and set title
     document.title = `${formatTime(Math.max(0, secondsLeft))} — ${mode}${paused}`;
   }, [secondsLeft, isWork, isLongBreak, isRunning]);
@@ -151,8 +155,14 @@ function Pomodoro() {
             : shortBreakMinutes * 60
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workMinutes, shortBreakMinutes, longBreakMinutes, isWork, isLongBreak]);
+  }, [
+    workMinutes,
+    shortBreakMinutes,
+    longBreakMinutes,
+    isWork,
+    isLongBreak,
+    isRunning,
+  ]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -169,8 +179,8 @@ function Pomodoro() {
     setIsRunning(false);
     // play a sound for the finished session
     try {
-      if (isWork) playSoundForFinishedSession('work');
-      else playSoundForFinishedSession(isLongBreak ? 'long' : 'short');
+      if (isWork) playSoundForFinishedSession("work");
+      else playSoundForFinishedSession(isLongBreak ? "long" : "short");
     } catch {
       // ignore audio errors
     }
@@ -196,7 +206,7 @@ function Pomodoro() {
       try {
         showWorkCompleteNotification(newRounds);
       } catch (e) {
-        console.error('Error showing work notification:', e);
+        console.error("Error showing work notification:", e);
       }
       // record stats after state updates to avoid cross-component setState during render
       try {
@@ -214,7 +224,7 @@ function Pomodoro() {
       try {
         showBreakCompleteNotification(isLongBreak);
       } catch (e) {
-        console.error('Error showing break notification:', e);
+        console.error("Error showing break notification:", e);
       }
       try {
         // schedule recording to avoid cross-component setState during render
@@ -230,9 +240,21 @@ function Pomodoro() {
       setSecondsLeft(workMinutes * 60);
       // do not auto-start work by default
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [secondsLeft, cyclesBeforeLongBreak, shortBreakMinutes, longBreakMinutes]);
-
+  }, [
+    secondsLeft,
+    cyclesBeforeLongBreak,
+    shortBreakMinutes,
+    longBreakMinutes,
+    isLongBreak,
+    recordWorkSession,
+    recordBreak,
+    rounds,
+    autoStartBreak,
+    playSoundForFinishedSession,
+    incrementRounds,
+    workMinutes,
+    isWork,
+  ]);
   const total =
     (isWork
       ? workMinutes * 60
@@ -248,7 +270,7 @@ function Pomodoro() {
     setIsRunning((r) => !r);
     // resume audio context on first user interaction so browsers allow sound later
     const ctx = ensureAudioContext();
-    if (ctx && ctx.state === 'suspended') {
+    if (ctx && ctx.state === "suspended") {
       ctx.resume().catch(() => {});
     }
   }
@@ -277,53 +299,52 @@ function Pomodoro() {
   }
 
   // listen to global commands (from command palette)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: functions are defined in component
   useEffect(() => {
     function onCmd(ev: Event) {
       const e = ev as CustomEvent<{ id: string }>;
       const id = e?.detail?.id;
       if (!id) return;
       switch (id) {
-        case 'start-pause':
+        case "start-pause":
           startPause();
           break;
-        case 'reset':
+        case "reset":
           reset();
           break;
-        case 'work':
+        case "work":
           setIsWork(true);
           setIsLongBreak(false);
           setSecondsLeft(workMinutes * 60);
           setIsRunning(false);
           break;
-        case 'short':
+        case "short":
           setIsWork(false);
           setIsLongBreak(false);
           setSecondsLeft(shortBreakMinutes * 60);
           setIsRunning(true);
           break;
-        case 'long':
+        case "long":
           setIsWork(false);
           setIsLongBreak(true);
           setSecondsLeft(longBreakMinutes * 60);
           setIsRunning(true);
           break;
-        case 'toggle-auto':
+        case "toggle-auto":
           setAutoStartBreak((v) => !v);
           break;
-        case 'open-stats': {
+        case "open-stats": {
           // scroll statistics into view
-          const stats = document.querySelector('[data-slot=statistics]');
+          const stats = document.querySelector("[data-slot=statistics]");
           if (stats)
-            stats.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            stats.scrollIntoView({ behavior: "smooth", block: "center" });
           break;
         }
       }
     }
-    window.addEventListener('pomodoro:command', onCmd as EventListener);
+    window.addEventListener("pomodoro:command", onCmd as EventListener);
     return () =>
-      window.removeEventListener('pomodoro:command', onCmd as EventListener);
-    // include dependencies that represent the durations so commands set correct seconds
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      window.removeEventListener("pomodoro:command", onCmd as EventListener);
   }, [workMinutes, shortBreakMinutes, longBreakMinutes]);
 
   return (
@@ -341,7 +362,7 @@ function Pomodoro() {
             <div>
               <CardTitle>Pomodoro</CardTitle>
               <CardDescription className="capitalize">
-                {isWork ? 'Focus time' : 'Break time'}
+                {isWork ? "Focus time" : "Break time"}
               </CardDescription>
             </div>
           </div>
@@ -361,7 +382,7 @@ function Pomodoro() {
           <div
             aria-live="polite"
             className="text-5xl sm:text-6xl md:text-7xl font-mono font-semibold"
-            style={{ color: isWork ? 'var(--primary)' : 'var(--secondary)' }}
+            style={{ color: isWork ? "var(--primary)" : "var(--secondary)" }}
           >
             {formatTime(Math.max(0, secondsLeft))}
           </div>
@@ -446,7 +467,7 @@ function Pomodoro() {
             onClick={startPause}
             className="w-full sm:flex-1 cursor-pointer"
           >
-            <TimerIcon /> {isRunning ? 'Pause' : 'Start'}
+            <TimerIcon /> {isRunning ? "Pause" : "Start"}
           </Button>
           <Button
             variant="outline"
